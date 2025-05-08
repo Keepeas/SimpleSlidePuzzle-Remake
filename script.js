@@ -6,9 +6,6 @@ const puzzle = {
 
   createTiles() {
     TL.length = 0;
-    this.tiles = [];
-    this.container.innerHTML = '';
-
     for (let i = 0; i < 15; i++) {
       TL.push({ value: i + 1, index: i });
     }
@@ -20,22 +17,30 @@ const puzzle = {
 
   render() {
     this.container.innerHTML = '';
-    TL.length = 0; // Reset global tile list
+    const sortedTiles = Array(16).fill(null);
 
-    this.tiles.forEach((tileObj, i) => {
-      tileObj.index = i; // Keep position info updated
+    this.tiles.forEach(tile => {
+      sortedTiles[tile.index] = tile;
+    });
 
+    const emptyIndex = this.tiles.findIndex(t => t.value === null);
+    const highlightEnabled = document.getElementById('highlightToggle')?.checked;
+
+    sortedTiles.forEach((tile, i) => {
       const el = document.createElement('div');
       el.classList.add('tile');
       el.dataset.index = i;
 
-      if (tileObj.value !== null) {
-        el.textContent = tileObj.value;
-        el.addEventListener('click', () => this.moveTile(tileObj));
-        TL[i] = tileObj; // Add to TL by visual grid index
+      if (tile.value !== null) {
+        el.textContent = tile.value;
+        el.addEventListener('click', () => this.moveTile(tile));
+
+        // 🔍 Highlight if movable and toggle is on
+        if (highlightEnabled && this.getAdjacentIndexes(emptyIndex).includes(tile.index)) {
+          el.classList.add('movable');
+        }
       } else {
         el.classList.add('empty');
-        TL[i] = tileObj; // Optional: include empty tile in TL
       }
 
       this.container.appendChild(el);
@@ -51,6 +56,9 @@ const puzzle = {
       [this.tiles[emptyIndex], this.tiles[fromIndex]] = [this.tiles[fromIndex], this.tiles[emptyIndex]];
       this.render();
     }
+	this.tiles.forEach((tile, i) => {
+      tile.index = i;
+    });
   },
 
   getAdjacentIndexes(index) {
@@ -73,6 +81,11 @@ const puzzle = {
         [this.tiles[i], this.tiles[j]] = [this.tiles[j], this.tiles[i]];
       }
     } while (!this.isSolvable());
+
+    // Now assign index based on visual position
+    this.tiles.forEach((tile, i) => {
+      tile.index = i;
+    });
 
     this.render();
   },
@@ -98,3 +111,6 @@ const puzzle = {
 };
 
 puzzle.createTiles();
+document.getElementById('highlightToggle').addEventListener('change', () => {
+  puzzle.render(); // Re-render to apply/remove highlights
+});
