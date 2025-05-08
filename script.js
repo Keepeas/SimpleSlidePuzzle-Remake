@@ -20,8 +20,10 @@ const puzzle = {
 
   render() {
     this.container.innerHTML = '';
+    TL.length = 0; // Reset global tile list
+
     this.tiles.forEach((tileObj, i) => {
-      tileObj.index = i; // Keep index updated
+      tileObj.index = i; // Keep position info updated
 
       const el = document.createElement('div');
       el.classList.add('tile');
@@ -30,8 +32,10 @@ const puzzle = {
       if (tileObj.value !== null) {
         el.textContent = tileObj.value;
         el.addEventListener('click', () => this.moveTile(tileObj));
+        TL[i] = tileObj; // Add to TL by visual grid index
       } else {
         el.classList.add('empty');
+        TL[i] = tileObj; // Optional: include empty tile in TL
       }
 
       this.container.appendChild(el);
@@ -71,6 +75,11 @@ const puzzle = {
     } while (!this.isSolvable());
 
     this.render();
+  },
+
+  originalShuffle() {
+	console.log("Original Shuffle not yet implemented.");
+	// TODO: Add your custom shuffle logic here.
   },
 
   isSolvable() {
