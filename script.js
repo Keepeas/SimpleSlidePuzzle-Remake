@@ -51,6 +51,10 @@ const puzzle = {
       // Swap positions in the tiles array
       [this.tiles[tilePos], this.tiles[emptyIndex]] = [this.tiles[emptyIndex], this.tiles[tilePos]];
       this.render();
+
+	  if (this.isSolved()) {
+        alert("Puzzle Solved!");
+      }
     }
   },
 
@@ -157,6 +161,13 @@ const puzzle = {
         TL.push(tile);
       }
     });
+  },
+
+  isSolved() {
+    for (let i = 0; i < 15; i++) {
+      if (this.tiles[i].value !== i + 1) return false;
+    }
+    return this.tiles[15].value === null;
   },
 
   isSolvable() {
