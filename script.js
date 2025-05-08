@@ -75,6 +75,19 @@ const puzzle = {
       }
     } while (!this.isSolvable());
 
+	// Update tile positions
+    this.tiles.forEach((tile, i) => {
+      tile.index = i; // Current visual position
+    });
+
+    // Rebuild TL array: visual order, skipping empty tile
+    TL.length = 0;
+    this.tiles.forEach(tile => {
+      if (tile.value !== null) {
+        TL.push(tile);
+      }
+    });
+
     this.render(); // This will update tile.index automatically
   },
 
