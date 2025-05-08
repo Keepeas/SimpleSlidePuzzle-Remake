@@ -10,6 +10,7 @@ body {
   gap: 5px;
   margin: 20px auto;
   width: max-content;
+  position: relative;
 }
 
 .tile {
@@ -22,7 +23,7 @@ body {
   cursor: pointer;
   user-select: none;
   border-radius: 5px;
-  transition: 0.2s;
+  transition: transform 0.2s ease;
 }
 
 .tile.empty {
