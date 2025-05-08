@@ -85,8 +85,69 @@ const puzzle = {
   },
 
   originalShuffle() {
-	console.log("Original Shuffle not yet implemented.");
-	// TODO: Add your custom shuffle logic here.
+    // 1. Reset to solved state
+    this.tiles = [];
+    for (let i = 0; i < 15; i++) {
+      this.tiles.push({ value: i + 1, index: i });
+    }
+    const emptyTile = { value: null, index: 15 };
+    this.tiles.push(emptyTile);
+
+    // Apply initial indexes
+    this.tiles.forEach((tile, i) => tile.index = i);
+
+    // Initial render + TL setup
+    this.render();
+    this.updateTileList();
+
+    // 2. Define reverse of the known solution moves
+    const moveSequence = [
+      "down", "right", "up", "right", "down", "left", "up", "up", "left", "up",
+      "left", "down", "right", "down", "left", "up", "right", "up", "right", "down",
+      "right", "down", "left", "left", "up", "up", "right", "down", "right", "up",
+      "left", "left", "left", "down", "right", "right", "down", "down", "left", "up",
+      "right", "down", "right", "up", "up", "left", "down", "down", "left", "left",
+      "up", "right", "down", "right", "right"
+    ];
+
+    // 3. Reverse the moves to create the scramble
+    const reverseMoves = [...moveSequence].reverse();
+
+    const directionToOffset = {
+      "up": 4,
+      "down": -4,
+      "left": 1,
+      "right": -1
+    };
+
+    // 4. Execute reverse moves by simulating "sliding blank" in opposite direction
+    reverseMoves.forEach(dir => {
+      const blankIndex = this.tiles.findIndex(t => t.value === null);
+      const offset = directionToOffset[dir];
+
+      const targetIndex = blankIndex + offset;
+
+      // Guard: ensure target is within bounds
+      const validMove = (i, d) => {
+        if (i < 0 || i > 15) return false;
+        const row = Math.floor(blankIndex / 4);
+        const col = blankIndex % 4;
+        if (d === "left" && col === 3) return false;
+        if (d === "right" && col === 0) return false;
+        return true;
+      };
+
+      if (validMove(targetIndex, dir)) {
+        [this.tiles[blankIndex], this.tiles[targetIndex]] = [this.tiles[targetIndex], this.tiles[blankIndex]];
+      }
+    });
+
+    // 5. Apply correct .index to each tile
+    this.tiles.forEach((tile, i) => tile.index = i);
+
+    // 6. Rebuild TL to reflect current layout
+    this.updateTileList();
+    this.render();
   },
 
   updateTileList() {
