@@ -17,16 +17,12 @@ const puzzle = {
 
   render() {
     this.container.innerHTML = '';
-    const sortedTiles = Array(16).fill(null);
-
-    this.tiles.forEach(tile => {
-      sortedTiles[tile.index] = tile;
-    });
-
-    const emptyIndex = this.tiles.findIndex(t => t.value === null);
     const highlightEnabled = document.getElementById('highlightToggle')?.checked;
+    const emptyIndex = this.tiles.findIndex(t => t.value === null);
 
-    sortedTiles.forEach((tile, i) => {
+    this.tiles.forEach((tile, i) => {
+      tile.index = i; // Assign visual position index here for reference
+
       const el = document.createElement('div');
       el.classList.add('tile');
       el.dataset.index = i;
@@ -35,8 +31,7 @@ const puzzle = {
         el.textContent = tile.value;
         el.addEventListener('click', () => this.moveTile(tile));
 
-        // 🔍 Highlight if movable and toggle is on
-        if (highlightEnabled && this.getAdjacentIndexes(emptyIndex).includes(tile.index)) {
+        if (highlightEnabled && this.getAdjacentIndexes(emptyIndex).includes(i)) {
           el.classList.add('movable');
         }
       } else {
@@ -48,17 +43,15 @@ const puzzle = {
   },
 
   moveTile(tileObj) {
-    const fromIndex = tileObj.index;
+    const tilePos = this.tiles.indexOf(tileObj);
     const emptyIndex = this.tiles.findIndex(t => t.value === null);
     const validMoves = this.getAdjacentIndexes(emptyIndex);
 
-    if (validMoves.includes(fromIndex)) {
-      [this.tiles[emptyIndex], this.tiles[fromIndex]] = [this.tiles[fromIndex], this.tiles[emptyIndex]];
+    if (validMoves.includes(tilePos)) {
+      // Swap positions in the tiles array
+      [this.tiles[tilePos], this.tiles[emptyIndex]] = [this.tiles[emptyIndex], this.tiles[tilePos]];
       this.render();
     }
-	this.tiles.forEach((tile, i) => {
-      tile.index = i;
-    });
   },
 
   getAdjacentIndexes(index) {
@@ -82,12 +75,7 @@ const puzzle = {
       }
     } while (!this.isSolvable());
 
-    // Now assign index based on visual position
-    this.tiles.forEach((tile, i) => {
-      tile.index = i;
-    });
-
-    this.render();
+    this.render(); // This will update tile.index automatically
   },
 
   originalShuffle() {
