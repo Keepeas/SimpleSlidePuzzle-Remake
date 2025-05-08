@@ -80,20 +80,22 @@ const puzzle = {
       tile.index = i; // Current visual position
     });
 
-    // Rebuild TL array: visual order, skipping empty tile
-    TL.length = 0;
-    this.tiles.forEach(tile => {
-      if (tile.value !== null) {
-        TL.push(tile);
-      }
-    });
-
+    this.updateTileList(); // Rebuild TL array: visual order, skipping empty tile
     this.render(); // This will update tile.index automatically
   },
 
   originalShuffle() {
 	console.log("Original Shuffle not yet implemented.");
 	// TODO: Add your custom shuffle logic here.
+  },
+
+  updateTileList() {
+    TL.length = 0;
+    this.tiles.forEach(tile => {
+      if (tile.value !== null) {
+        TL.push(tile);
+      }
+    });
   },
 
   isSolvable() {
